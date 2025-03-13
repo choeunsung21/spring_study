@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<th:block th:fragment="navLayout">
+		<link th:href="@{/css/include/nav.css}" rel="stylesheet">
+		<nav>
+			<div id="nav_wrap">
+				<div class="menu">
+					<ul>
+						<li>
+							<a th:href="@{/board/create}">게시글 등록</a>
+						</li>
+						<li>
+							<a href="#">로그인</a>
+						</li>
+						<li>
+							<a href="#">회원가입</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</th:block>
+</html>
