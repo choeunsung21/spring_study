@@ -1,16 +1,20 @@
 package com.gn.mvc.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gn.mvc.dto.BoardDto;
+import com.gn.mvc.dto.SearchDto;
+import com.gn.mvc.entity.Board;
 import com.gn.mvc.service.BoardService;
 
 import lombok.RequiredArgsConstructor;
@@ -69,6 +73,17 @@ public class BoardController {
 		
 		
 		return resultMap;
+	}
+	
+	@GetMapping("/board")
+	public String selectBoardAll(Model model, SearchDto searchDto) {
+		// 1. DB에서 목록 SELECT
+		List<Board> resultList = service.selectBoardAll(searchDto);
+		// 2. 목록 Model에 등록
+		model.addAttribute("boardList",resultList);
+		model.addAttribute("searcDto", searchDto);
+		// 3. list.html에 데이터 세팅
+		return "board/list";
 	}
 
 }
