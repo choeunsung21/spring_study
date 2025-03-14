@@ -53,8 +53,8 @@ layout:decorate="~{/include/layout}">
 					})
 					.then(response => response.json())
 					.then(data => {
-						console.log(data);
 						alert(data.res_msg)
+						location.href="/";
 					})
 					.catch(error => {
 						console.log(error);
