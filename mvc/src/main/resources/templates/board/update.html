@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{/include/layout}">
+	<th:block layout:fragment="content">	
+		<link th:href="@{/css/board/create.css}" rel="stylesheet">
+		<section>
+			<div id="section_wrap">
+				<div class="word">
+					<h3>게시글 수정</h3>
+				</div><br>
+				<div class="register_board_form">
+					<form name="update_board_form">	
+						<input type="hidden" name="board_no" th:value="${board.boardNo}">
+						<input type="text" name="board_title" th:value="${board.boardTitle}"> <br>
+						<input type="text" name="board_content" th:value="${board.boardContent}"><br>
+						<input type="hidden" name="board_writer" th:value="${board.member.memberNo}">
+						<input type="submit" value="수정">
+					</form>
+				</div>
+			</div>
+		</section>
+		<script>
+			const form = document.update_board_form;
+			form.addEventListener('submit',function(e){
+				e.preventDefault();
+				let vali_check = false;
+				let vali_text='';
+				if(form.board_title.value == ''){
+					vali_text += '제목을 입력하세요.';
+					form.board_title.focus();
+				} else if(form.board_content.value == ''){
+					vali_text += '내용을 입력하세요.';
+					form.board_content.focus();
+				} else{
+					vali_check = true;
+				}
+				
+				if(vali_check==false){
+					alert(vali_text);
+				} else{
+					const payload = new FormData(form);
+					fetch('/board/'+form.board_no.value+"/update",{
+						method:'post',
+						body:payload
+					})
+					.then(response => response.json())
+					.then(data => {
+						alert(data.res_msg);
+						if(data.res_msg==200){
+							location.href='/board';
+						}
+					})
+				}
+			});
+		</script>
+    </th:block>
+</html>

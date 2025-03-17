@@ -1,11 +1,14 @@
 package com.gn.mvc.service;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.gn.mvc.dto.BoardDto;
+import com.gn.mvc.dto.PageDto;
 import com.gn.mvc.dto.SearchDto;
 import com.gn.mvc.entity.Board;
 import com.gn.mvc.repository.BoardRepository;
@@ -35,7 +38,7 @@ public class BoardService {
 		return new BoardDto().toDto(result);
 	}
 	
-	public List<Board> selectBoardAll(SearchDto searchDto) {
+	public Page<Board> selectBoardAll(SearchDto searchDto, PageDto pageDto) {
 //		List<Board> list = new ArrayList<Board>();
 //		if(searchDto.getSearch_type() == 1) {
 //			// 제목 기준으로 검색
@@ -52,6 +55,18 @@ public class BoardService {
 //		}
 //		return list;
 		
+		// 정렬
+//		Sort sort = Sort.by("regDate").descending();
+//		if(searchDto.getOrder_type()==2) {
+//			sort = Sort.by("regDate").ascending();
+//		}
+		
+		// 페이징
+		Pageable pageable = PageRequest.of(pageDto.getNowPage()-1, pageDto.getNumPerPage(), Sort.by("regDate").descending());
+		if(searchDto.getOrder_type()==2) {
+			pageable = PageRequest.of(pageDto.getNowPage()-1, pageDto.getNumPerPage(), Sort.by("regDate").ascending());
+		}
+		
 		Specification<Board> spec= (root,query,criteriaBuilder) -> null;
 		
 		if(searchDto.getSearch_type() == 1) {
@@ -62,8 +77,40 @@ public class BoardService {
 			spec = spec.and(BoardSpecification.boardTitleContains(searchDto.getSearch_text()))
 					.or(BoardSpecification.boardContentContains(searchDto.getSearch_text()));
 		}
-		List<Board> list = repository.findAll(spec);
+		Page<Board> list = repository.findAll(spec,pageable);
 		return list;
+	}
+
+	public Board selectBoardOne(Long id) {
+		return repository.findById(id).orElse(null);
+	}
+
+	public Board updateBoard(BoardDto param) {
+//		Board boardParam = param.toEntity();
+//		Board result = repository.save(boardParam);	
+//		return new BoardDto().toDto(result);
+		Board result = null;
+		// 1. @Id를 쓴 필드를 기준으로 타겟 조회
+		Board target = repository.findById(param.getBoard_no()).orElse(null);
+		// 2. 타겟이 존재하는 경우 업데이트
+		if(target != null) {
+			result = repository.save(param.toEntity());
+		}
+		return result;
+	}
+
+	public int deleteBoard(Long id) {
+		int result = 0;
+		try {
+			Board target = repository.findById(id).orElse(null);
+			if(target != null) {
+				repository.deleteById(id);
+			}
+			result = 1;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }

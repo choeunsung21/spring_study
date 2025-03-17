@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{/include/layout}">
+	<th:block layout:fragment="content">	
+		<link th:href="@{/css/board/detail.css}" rel="stylesheet">
+		<section>	
+			<div id="section_wrap">
+				<div class="word">
+					<h3>게시글 상세 정보</h3>
+				</div>
+				<div class="board_detail">
+					<ul>
+						<li>
+							<img src="">
+							<br>
+							<span></span>
+						</li>
+						<li>
+							<table>
+								<tr>
+									<td>제목</td>
+									<td th:text="${board.boardTitle}">제목</td>
+								</tr>
+								<tr>
+									<td>내용</td>
+									<td th:text="${board.boardContent}">내용</td>
+								</tr>
+								<tr>
+									<td>작성자</td>
+									<td th:text="${board.member.memberName}">작성자</td>
+								</tr>
+								<tr>
+									<td>등록일</td>
+									<td th:text="${#temporals.format(board.regDate,('yy-MM-dd / HH:mm:ss'))}">등록일</td>
+								</tr>
+								<tr>
+									<td>수정일</td>
+									<td th:text="${#temporals.format(board.modDate,('yy-MM-dd / HH:mm:ss'))}">수정일</td>
+								</tr>
+							</table>
+						</li>
+					</ul>		
+				</div>
+				<div class="buttons">
+					<a th:href="@{/board/{id}/update(id=${board.boardNo})}">수정</a>
+					<a th:onclick="|javascript:boardDelete('${board.boardNo}')|">삭제</a>			
+				</div>
+			</div>
+		</section>
+		<script>
+			const boardDelete = function(boardNo){
+				console.log(boardNo);
+				// 1. confirm 함수 사용 -> 게시글 삭제 여부 확인
+				if(confirm('삭제하시겠습니까?')){
+					// 2. 동의 -> fetch 사용 삭제
+					//	1) url : /board/1
+					//	2) method : 'delete'
+					//	3) 응답 데이터 출력 -> 수정 동일
+					fetch('/board/'+boardNo+"/delete",{
+						method:'delete'
+					})
+					.then(response=>response.json())
+					.then(data => {
+						alert(data.res_msg);
+						if(data.res_code==200){
+							location.href='/board';
+						}
+					})
+				}
+				// 3. 컨트롤러 요청 받는 메소드
+			}
+		</script>
+    </th:block>
+</html>
