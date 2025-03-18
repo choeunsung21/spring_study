@@ -15,12 +15,46 @@ layout:decorate="~{/include/layout}">
 						<input type="text" name="board_title" th:value="${board.boardTitle}"> <br>
 						<input type="text" name="board_content" th:value="${board.boardContent}"><br>
 						<input type="hidden" name="board_writer" th:value="${board.member.memberNo}">
+						<div th:if="${!#lists.isEmpty(attachList)}"
+								  th:each="attach : ${attachList}">
+							<input type="hidden" name="delete_files" th:value="${attach.attachNo}" disabled>
+							<span th:text="${attach.oriName}">파일명</span>
+							<button type="button" class="btn_close" onclick="changeStatus(this)">삭제</button>
+						</div>
+						<input type="file" name="files" multiple><br>
 						<input type="submit" value="수정">
 					</form>
 				</div>
 			</div>
 		</section>
 		<script>
+			const changeStatus = function(element){
+				// 1. btn_close 클래스
+				// -> disabled를 false
+				// -> 버튼 글자 : 유지
+				// -> 클래서 : btn_open
+				// -> 파일명 : line-through
+				// 2. btn_open 클래스
+				
+				const parent = element.parentElement;
+				const child1 = parent.firstElementChild;
+				const child2 = child1.nextElementSibling;
+				
+				if(element.classList.contains('btn_close')){
+					element.classList.remove('btn_close');
+					element.classList.add('btn_open');
+					element.innerText = '유지';
+					child1.disabled=false;
+					child2.style.textDecoration= 'line-through';
+				} else {
+					element.classList.remove('btn_open');
+					element.classList.add('btn_close');
+					element.innerText = '삭제';
+					child1.disabled=true;
+					child2.style.textDecoration= 'none';
+				}
+			}
+		
 			const form = document.update_board_form;
 			form.addEventListener('submit',function(e){
 				e.preventDefault();
