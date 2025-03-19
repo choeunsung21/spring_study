@@ -47,8 +47,12 @@ layout:decorate="~{/include/layout}">
 					alert(vali_text);
 				} else {
 					const payload = new FormData(form);
-					fetch("/member",{
+					fetch("/signup",{
 						method:'post',
+						headers : {
+							'header': document.querySelector('meta[name="_csrf_header"]').content,
+				            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+						},
 						body:payload
 					})
 					.then(response => response.json())

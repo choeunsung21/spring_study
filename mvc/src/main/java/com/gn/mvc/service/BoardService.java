@@ -25,13 +25,14 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BoardService {
-	
+
 //	@Autowired
 //	BoardRepository repository;
-	
+
 	private final BoardRepository repository;
 	private final AttachRepository attachRepository;
-	
+	private final AttachService attachService;
+
 	@Transactional(rollbackFor = Exception.class)
 	public int createBoard(BoardDto dto, List<AttachDto> attachList) {
 		int result = 0;
@@ -42,8 +43,8 @@ public class BoardService {
 			// 2. insert 결과로 반환받은 PK
 			Long boardNo = saved.getBoardNo();
 			// 3. attachList에 데이터가 있는 경우
-			if(attachList.size()!=0) {
-				for(AttachDto attachDto : attachList) {
+			if (attachList.size() != 0) {
+				for (AttachDto attachDto : attachList) {
 					attachDto.setBoard_no(boardNo);
 					Attach attach = attachDto.toEntity();
 					// 4. Attach 엔티티 insert
@@ -54,7 +55,7 @@ public class BoardService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 //		// 1. 매개변수 dto -> entity
 //		//Board param = Board.builder()
@@ -67,7 +68,7 @@ public class BoardService {
 //		// 3. 결과 entity -> dto
 //		return new BoardDto().toDto(result);
 	}
-	
+
 	public Page<Board> selectBoardAll(SearchDto searchDto, PageDto pageDto) {
 //		List<Board> list = new ArrayList<Board>();
 //		if(searchDto.getSearch_type() == 1) {
@@ -84,30 +85,32 @@ public class BoardService {
 //			list = repository.findAll();
 //		}
 //		return list;
-		
+
 		// 정렬
 //		Sort sort = Sort.by("regDate").descending();
 //		if(searchDto.getOrder_type()==2) {
 //			sort = Sort.by("regDate").ascending();
 //		}
-		
+
 		// 페이징
-		Pageable pageable = PageRequest.of(pageDto.getNowPage()-1, pageDto.getNumPerPage(), Sort.by("regDate").descending());
-		if(searchDto.getOrder_type()==2) {
-			pageable = PageRequest.of(pageDto.getNowPage()-1, pageDto.getNumPerPage(), Sort.by("regDate").ascending());
+		Pageable pageable = PageRequest.of(pageDto.getNowPage() - 1, pageDto.getNumPerPage(),
+				Sort.by("regDate").descending());
+		if (searchDto.getOrder_type() == 2) {
+			pageable = PageRequest.of(pageDto.getNowPage() - 1, pageDto.getNumPerPage(),
+					Sort.by("regDate").ascending());
 		}
-		
-		Specification<Board> spec= (root,query,criteriaBuilder) -> null;
-		
-		if(searchDto.getSearch_type() == 1) {
+
+		Specification<Board> spec = (root, query, criteriaBuilder) -> null;
+
+		if (searchDto.getSearch_type() == 1) {
 			spec = spec.and(BoardSpecification.boardTitleContains(searchDto.getSearch_text()));
-		} else if(searchDto.getSearch_type() == 2) {
+		} else if (searchDto.getSearch_type() == 2) {
 			spec = spec.and(BoardSpecification.boardContentContains(searchDto.getSearch_text()));
-		} else if(searchDto.getSearch_type() == 3) {
+		} else if (searchDto.getSearch_type() == 3) {
 			spec = spec.and(BoardSpecification.boardTitleContains(searchDto.getSearch_text()))
 					.or(BoardSpecification.boardContentContains(searchDto.getSearch_text()));
 		}
-		Page<Board> list = repository.findAll(spec,pageable);
+		Page<Board> list = repository.findAll(spec, pageable);
 		return list;
 	}
 
@@ -115,16 +118,39 @@ public class BoardService {
 		return repository.findById(id).orElse(null);
 	}
 
-	public Board updateBoard(BoardDto param) {
+	@Transactional(rollbackFor = Exception.class)
+	public Board updateBoard(BoardDto param, List<AttachDto> attachList) {
 //		Board boardParam = param.toEntity();
 //		Board result = repository.save(boardParam);	
 //		return new BoardDto().toDto(result);
 		Board result = null;
-		// 1. @Id를 쓴 필드를 기준으로 타겟 조회
-		Board target = repository.findById(param.getBoard_no()).orElse(null);
-		// 2. 타겟이 존재하는 경우 업데이트
-		if(target != null) {
-			result = repository.save(param.toEntity());
+		try {			
+			// 1. @Id를 쓴 필드를 기준으로 타겟 조회
+			Board target = repository.findById(param.getBoard_no()).orElse(null);
+			// 2. 타겟이 존재하는 경우 업데이트
+			if (target != null) {
+				// 3. 파일이 존재하는 경우
+				if(param.getDelete_files() != null && !param.getDelete_files().isEmpty()) {
+					for(Long attach_no : param.getDelete_files()) {
+						// 1) 메모리에서 파일 자체 삭제
+						if(attachService.deleteFileData(attach_no) > 0) {
+							// 2) DB에서 메타 데이터 삭제					
+							attachService.deleteMetaData(attach_no);
+							
+						}
+					}
+				}
+				result = repository.save(param.toEntity());
+			}
+			if (attachList.size() != 0) {
+				for (AttachDto attachDto : attachList) {
+					attachDto.setBoard_no(param.getBoard_no());
+					Attach attach = attachDto.toEntity();
+					attachRepository.save(attach);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -133,11 +159,11 @@ public class BoardService {
 		int result = 0;
 		try {
 			Board target = repository.findById(id).orElse(null);
-			if(target != null) {
+			if (target != null) {
 				repository.deleteById(id);
 			}
 			result = 1;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;

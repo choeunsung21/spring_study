@@ -4,6 +4,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="UTF-8">
 <title>게시판</title>
+<meta id="_csrf" name="_csrf" th:attr="content=${_csrf.token}">
+<meta id="_csrf_header" name="_csrf_header" th:attr="content=${_csrf.headerName}">
 </head>
 <body>
 	<th:block th:replace="~{include/header :: headerLayout}"></th:block>

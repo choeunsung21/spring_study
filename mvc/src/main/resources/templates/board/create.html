@@ -46,7 +46,9 @@ layout:decorate="~{/include/layout}">
 					})
 					.then(response => response.json())
 					.then(data => {
-						console.log(data);
+						if(data.res_code=="200"){
+							location.href='/board';
+						}
 					})
 					.catch(error => {
 						console.log(error);
