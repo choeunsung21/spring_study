@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{/include/layout}">
+	<th:block layout:fragment="content">	
+		<link th:href="@{/css/member/create.css}" rel="stylesheet">
+		<section>
+			<div id="section_wrap">
+				<div class="word">
+					<h3>회원 수정</h3>
+				</div><br>
+				<div class="create_member_form">
+					<form name="update_member_form">
+						<input type="hidden" name="member_no" th:value="${member.memberNo}">
+						<input type="text" name="member_id" th:value="${member.memberId}" readonly> <br>
+						<input type="password" name="member_pw" placeholder="비밀번호"> <br>
+						<input type="password" name="member_pw_check" placeholder="비밀번호 확인"> <br>
+						<input type="text" name="member_name" th:value="${member.memberName}"> <br>
+						<input type="submit" value="수정"> 
+					</form>
+				</div>
+			</div>
+		</section>	
+		<script>
+			const form = document.update_member_form;
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+				
+				const payload = new FormData(form);
+				fetch("/member/"+form.member_no.value+"/update", {
+					method : 'post',
+					headers: {
+			              'header': document.querySelector('meta[name="_csrf_header"]').content,
+			              'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+					},			
+					body : payload
+				
+				})
+				.then(response => response.json())
+				.then(data => {
+					alert(data.res_msg);
+					if(data.res_code == "200") {
+						location.href="/";
+					}
+				})
+			})
+		</script>	
+    </th:block>
+</html>

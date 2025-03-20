@@ -1,23 +1,47 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-	<th:block th:fragment="navLayout">
-		<link th:href="@{/css/include/nav.css}" rel="stylesheet">
-		<nav>
-			<div id="nav_wrap">
-				<div class="menu">
-					<ul>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="navLayout">
+	<link th:href="@{/css/include/nav.css}" rel="stylesheet">
+	<nav>
+		<div id="nav_wrap">
+			<div class="menu">
+				<ul>
+					<th:block sec:authorize="isAnonymous()">
+						<li><a th:href="@{/login}">로그인</a></li>
+						<li><a th:href="@{/signup}">회원가입</a></li>
+					</th:block>
+					<th:block sec:authorize="isAuthenticated()">
 						<li>
-							<a th:href="@{/board}">게시판</a>
+							<form th:action="@{/logout}" method="post">
+								<input type="submit" value="로그아웃">
+							</form>
 						</li>
-						<li>
-							<a th:href="@{/login}">로그인</a>
-						</li>
-						<li>
-							<a th:href="@{/signup}">회원가입</a>
-						</li>
-					</ul>
-				</div>
+						<li><a th:href="@{/board}">게시판</a></li>
+						<li><a th:href="@{/member/{memberNo}/update(memberNo=${#authentication.principal.member.memberNo})}">회원 수정</a></li>
+						<li><a th:onclick="|javascript:memberDelete('${#authentication.principal.member.memberNo}')|">회원 탈퇴</a></li>
+					</th:block>
+				</ul>
 			</div>
-		</nav>
-	</th:block>
+		</div>
+	</nav>
+	<script>
+	function memberDelete(memberNo) {
+        if (confirm("정말 탈퇴하시겠습니까?")) {
+        	fetch("/member/"+memberNo, {
+                method: "DELETE",
+                headers: {
+                	'header': document.querySelector('meta[name="_csrf_header"]').content,
+		            'X-CSRF-Token': document.querySelector('meta[name="_csrf"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("회원 탈퇴가 완료되었습니다.");
+                location.href = "/";
+            })
+        }
+    }
+	</script>
+</th:block>
 </html>

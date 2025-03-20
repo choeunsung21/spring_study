@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-layout:decorate="~{/include/layout}">
+layout:decorate="~{/include/layout}"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<th:block layout:fragment="content">
 		<style>
 			section {
@@ -17,6 +18,10 @@ layout:decorate="~{/include/layout}">
 			<div id="section_wrap">
 				<div class="word">
 					<h3>HOME</h3>
+					<th:block sec:authorize="isAuthenticated()">
+						<span sec:authentication="principal.member.memberName"></span><span>님 환영합니다</span><br>
+						<span th:text="|${#authentication.principal.member.memberName}님 환영합니다|"></span>
+					</th:block>
 				</div>
 			</div>
 		</section>
