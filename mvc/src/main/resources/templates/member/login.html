@@ -8,6 +8,10 @@ layout:decorate="~{/include/layout}">
 		<div id="section_wrap">
 			<div class="word">
 				<h3>로그인</h3>
+				<th:block th:if="${error == 'true'}">
+				<br>* <span th:text="${errorMsg}"></span> *<br>
+					
+				</th:block>
 			</div>
 			<div class="login_form">
 				<form name="login_form" action="/login" method="post">
