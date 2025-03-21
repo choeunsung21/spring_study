@@ -59,7 +59,7 @@
 	</appender>
 
 	<!-- root레벨 설정 -->
-	<root level="INFO">
+	<root level="WARN">
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE" />
 	</root>

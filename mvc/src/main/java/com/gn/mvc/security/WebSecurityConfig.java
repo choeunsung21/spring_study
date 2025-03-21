@@ -36,7 +36,7 @@ public class WebSecurityConfig {
 	// 특정 요청이 들어왔을 때 어떻게 처리할 것인가
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http, UserDetailsService customUserDetailsService) throws Exception{
-		http.userDetailsService(customUserDetailsService).authorizeHttpRequests(request -> request.requestMatchers("/login","/signup","logout","/").permitAll().anyRequest().authenticated())
+		http.userDetailsService(customUserDetailsService).authorizeHttpRequests(request -> request.requestMatchers("/login","/signup","logout","/").permitAll().requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated())
 		.formLogin(login -> login.loginPage("/login").successHandler(new MyLoginSuccessHandler()).failureHandler(new MyLoginFailureHandler()))
 		.logout(logout -> logout.logoutUrl("/logout").clearAuthentication(true).logoutSuccessUrl("/login").invalidateHttpSession(true).deleteCookies("remember-me"))
 		.rememberMe(rememberMe -> rememberMe.rememberMeParameter("remember-me").tokenValiditySeconds(60*60*24*30).alwaysRemember(false).tokenRepository(tokenRepository()));

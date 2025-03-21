@@ -14,11 +14,17 @@ layout:decorate="~{/include/layout}">
 				</div><br>
 				<div class="create_member_form">
 					<form name="create_member_form">
-						<input type="text" name="member_id" placeholder="아이디"> <br>
-						<input type="password" name="member_pw" placeholder="비밀번호"> <br>
-						<input type="password" name="member_pw_check" placeholder="비밀번호 확인"> <br>
-						<input type="text" name="member_name" placeholder="닉네임"> <br>
-						<input type="submit" value="회원가입"> 
+						<input type="text" name="member_id" placeholder="아이디"><br>
+						<input type="password" name="member_pw" placeholder="비밀번호"><br>
+						<input type="password" name="member_pw_check" placeholder="비밀번호 확인"><br>
+						<input type="text" name="member_name" placeholder="닉네임"><br>
+						
+						<input type="radio" name="member_role" value="ROLE_USER" id="role_user" checked>
+						<label for="role_user">사용자</label><br>
+						<input type="radio" name="member_role" value="ROLE_ADMIN" id="role_admin">
+						<label for="role_admin">관리자</label><br>
+						
+						<input type="submit" value="회원가입">
 					</form>
 				</div>
 			</div>

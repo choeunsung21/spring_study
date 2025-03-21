@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+layout:decorate="~{/include/layout}">
+	<th:block layout:fragment="content">	
+    <div class="container">
+	    <h1>1:1 채팅</h1>
+	    <input type="hidden" id="roomNo" th:value="${chatRoom.roomNo}">
+	    <span th:text="|보내는 사람 : ${#authentication.principal.member.memberName}|"></span>
+	    <input type="hidden" id="senderNo" th:value="${#authentication.principal.member.memberNo}">
+	    <br>
+	    
+	    <th:block th:if="${chatRoom.toMember.memberNo == #authentication.principal.member.memberNo}">
+		    <span th:text="|받는 사람 : ${chatRoom.fromMember.memberName}|"></span>
+		    <input type="hidden" id="receiverNo" th:value="${chatRoom.fromMember.memberNo}">
+	    </th:block>
+	     
+	    <th:block th:if="${chatRoom.fromMember.memberNo == #authentication.principal.member.memberNo}">
+	    	<span th:text="|받는 사람 : ${chatRoom.toMember.memberName}|"></span>
+		    <input type="hidden" id="receiverNo" th:value="${chatRoom.toMember.memberNo}">
+	    </th:block>
+	    
+		<br>
+	    <textarea id="msgContent" placeholder="메시지 입력"></textarea>
+	    <br>
+	    <button onclick="sendMsg();">전송</button>
+	    <div id="chatBox">
+	    
+	    </div>
+    </div>
+    <script>
+    	let senderNo = document.getElementById("senderNo").value;
+    	let socket = new WebSocket("ws://localhost:8080/ws/chat?senderNo="+senderNo);
+    	
+    	const sendMsg = function(){
+    		// 채팅방, 받는 사람, 보내는 사람, 메시지
+    		let roomNo = document.getElementById("roomNo").value;
+    		let receiverNo = document.getElementById("receiverNo").value;
+    		let msgContent = document.getElementById("msgContent").value;
+    		
+    		socket.send(JSON.stringify({
+    			sender_no:senderNo,room_no:roomNo,receiver_no:receiverNo,msg_content:msgContent
+    		}));
+    		document.getElementById("msgContent").value="";
+    	}
+    	
+    	socket.onmessage = function(event){
+    		document.getElementById("chatBox").innerHTML += "<p>"+event.data+"</p>";
+    	}
+    </script>
+    </th:block>
+</html>

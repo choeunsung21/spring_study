@@ -25,5 +25,32 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 				</div>
 			</div>
 		</section>
+		<h1>WebSocket 테스트</h1>
+		<input type="text" id="msg">
+		<input type="button" value="전송" onclick="sendMsg();">
+		<div id="output"></div>
+		<script>
+			let socket = new WebSocket("ws://localhost:8080/ws/basic");
+			
+			socket.onopen = function(){
+				// 클라이언트 -> 서버 연결 요청
+				// 서버의 afterConnectionEstablished 메소드
+				console.log("클라이언트 : 연결");
+			}
+			
+			socket.onmessage = function(event){
+				// 클라이언트 -> 서버 메시지 send
+				// 메시지를 서버가 handleTextMessage에서 처리
+				// 서버의 sendMessage 메소드 동작
+				// console.log(event.data);
+				document.getElementById('output').innerHTML += '<p>'+event.data+'</p>';
+			}
+			
+			const sendMsg = function(){
+				let msg = document.getElementById('msg').value;
+				socket.send(msg);
+				document.getElementById('msg').value="";
+			}
+		</script>
 	</th:block>
 </html>

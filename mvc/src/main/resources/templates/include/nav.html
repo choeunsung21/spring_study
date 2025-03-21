@@ -20,6 +20,7 @@
 						<li><a th:href="@{/board}">게시판</a></li>
 						<li><a th:href="@{/member/{memberNo}/update(memberNo=${#authentication.principal.member.memberNo})}">회원 수정</a></li>
 						<li><a th:onclick="|javascript:memberDelete('${#authentication.principal.member.memberNo}')|">회원 탈퇴</a></li>
+						<li><a th:href="@{/chat/list}">채팅하기</a></li>
 					</th:block>
 				</ul>
 			</div>
