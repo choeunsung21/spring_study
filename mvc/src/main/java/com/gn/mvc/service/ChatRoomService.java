@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.gn.mvc.entity.ChatMsg;
 import com.gn.mvc.entity.ChatRoom;
 import com.gn.mvc.repository.ChatRoomRepository;
 import com.gn.mvc.security.MemberDetails;
@@ -36,4 +37,6 @@ public class ChatRoomService {
 		ChatRoom result = repository.findById(id).orElse(null);
 		return result;
 	}
+
+
 }
